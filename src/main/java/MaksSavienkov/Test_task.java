@@ -59,8 +59,9 @@ public class DocumentManager {
      * @return optional document
      */
     public Optional<Document> findById(String id) {
-
-        return Optional.empty();
+        return documents.stream()
+                .filter(doc -> doc.getId().equals(id))
+                .findFirst();
     }
 
     private boolean isValidDocument(Document document) {
