@@ -17,6 +17,8 @@ import java.util.Optional;
  */
 public class DocumentManager {
 
+    private final List<Document> documents;
+
     /**
      * Implementation of this method should upsert the document to your storage
      * And generate unique id if it does not exist, don't change [created] field
@@ -25,7 +27,13 @@ public class DocumentManager {
      * @return saved document
      */
     public Document save(Document document) {
-
+        // In the real project maybe safer to create DocumentDto and receive author as an id
+        if (isValidDocument(document)) {
+            if (isNullOrEmpty(document.getId())) {
+                document.setId(UUID.randomUUID().toString());
+            }
+            documents.add(document);
+        }
         return null;
     }
 
@@ -49,6 +57,23 @@ public class DocumentManager {
     public Optional<Document> findById(String id) {
 
         return Optional.empty();
+    }
+
+    private boolean isValidDocument(Document document) {
+        //In case of backend app I would prefer to throw some exceptions than catch them in the handler
+        if (document != null) {
+            return !isNullOrEmpty(document.getTitle())
+                    && !isNullOrEmpty(document.getContent())
+                    && document.getAuthor() != null
+                    && !isNullOrEmpty(document.getAuthor().getId())
+                    && document.getCreated() != null
+                    && document.getCreated().isAfter(Instant.now());
+        }
+        return false;
+    }
+
+    private boolean isNullOrEmpty(String str) {
+        return str == null || str.isBlank();
     }
 
     @Data
